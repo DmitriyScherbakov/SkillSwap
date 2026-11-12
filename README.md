@@ -1,14 +1,14 @@
 # SkillSwap
 
-REST API для обмена навыками внутри сообщества. Пользователи предлагают умения (гитара, Linux, английский) и запрашивают чужие.
+REST API for skill sharing within the community. Users offer skills (guitar, Linux, English) and request others.
 
 **Стек:** Java 21 · Spring Boot 4.1 · Spring Security (JWT) · Spring Data JPA · PostgreSQL · H2 · Docker · JUnit 5
 
 ---
 
-## Запуск
+## Launch
 
-**Требования:** JDK 21, Docker.
+**Requirements:** JDK 21, Docker.
 
 **Dev (H2):**
 .\mvnw.cmd spring-boot:run
@@ -32,7 +32,7 @@ text
 
 ---
 
-## Тестовые пользователи
+## Test users
 
 | Username | Password | Role |
 |----------|----------|------|
@@ -45,25 +45,25 @@ text
 ## API
 
 **Auth:**
-- `POST /api/auth/register` — регистрация
-- `POST /api/auth/login` — логин, возвращает JWT
+- `POST /api/auth/register` — registration
+- `POST /api/auth/login` — login, return JWT
 
-**Skills (требуют JWT):**
-- `GET /api/skills?page=0&size=20&sort=title,asc` — список с пагинацией
-- `POST /api/skills` — создать
-- `PUT /api/skills/{id}` — обновить (владелец или ADMIN)
-- `DELETE /api/skills/{id}` — удалить (только ADMIN)
+**Skills (require JWT):**
+- `GET /api/skills?page=0&size=20&sort=title,asc` — list with pagination
+- `POST /api/skills` — create
+- `PUT /api/skills/{id}` — update (owner or Admin)
+- `DELETE /api/skills/{id}` — delete (only ADMIN)
 
-Коды: `200` успех · `201` создано · `204` без тела · `400` невалидные данные · `401` без токена · `403` нет прав · `404` не найдено.
+Cods: `200` success · `201` created · `204` witout body · `400` invalid data · `401` witout token · `403` no rights · `404` didnt found.
 
 ---
 
-## Реализовано
+## Implemented
 
-- JWT-аутентификация, роли `USER`/`ADMIN`
-- Resource-level авторизация (`@PreAuthorize` + `SkillSecurity`)
-- Пагинация и сортировка, решён N+1 через `@EntityGraph`
-- Глобальная обработка ошибок, валидация
-- Audit log через `@Transactional(REQUIRES_NEW)`
+- JWT authentication, roles `USER`/`ADMIN`
+- Resource-level authorization (`@PreAuthorize` + `SkillSecurity`)
+- Pagination and sorting, solved N+1 via `@EntityGraph`
+- Global error handling, validation
+- Audit log via `@Transactional(REQUIRES_NEW)`
 - Actuator: health, liveness/readiness
-- Swagger UI, профили `dev`/`prod`, Docker Compose
+- Swagger UI, `dev`/`prod` profiles, Docker Compose
