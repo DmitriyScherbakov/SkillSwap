@@ -13,7 +13,6 @@ REST API for skill sharing within the community. Users offer skills (guitar, Lin
 **Dev (H2):**
 .\mvnw.cmd spring-boot:run
 
-text
 - API: http://localhost:8080
 - Swagger: http://localhost:8080/swagger-ui.html
 - H2: http://localhost:8080/h2-console (JDBC `jdbc:h2:mem:skillswap`, user `sa`)
@@ -22,13 +21,10 @@ text
 docker compose up -d
 $env:SPRING_PROFILES_ACTIVE="prod"; .\mvnw.cmd spring-boot:run
 
-text
 PostgreSQL: `localhost:5433`. Данные сохраняются между перезапусками.
 
 **Тесты:**
 .\mvnw.cmd clean test
-
-text
 
 ---
 
