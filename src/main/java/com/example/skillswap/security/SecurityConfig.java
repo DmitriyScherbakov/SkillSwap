@@ -1,5 +1,6 @@
 package com.example.skillswap.security;
 
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@EnableCaching
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
