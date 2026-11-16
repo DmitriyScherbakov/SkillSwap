@@ -1,6 +1,7 @@
 package com.example.skillswap.Tests;
 
 import com.example.skillswap.Controllers.SkillController;
+import com.example.skillswap.DTO.PagedResponse;
 import com.example.skillswap.DTO.SkillDto;
 import com.example.skillswap.Repositories.SkillRepository;
 import com.example.skillswap.Services.SkillService;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -59,19 +61,27 @@ class SkillControllerTest {
     @MockitoBean(name = "skillSecurity")
     private SkillSecurity skillSecurity;
 
-
+    @MockitoBean
+    private CacheManager cacheManager;
 
     @Test
     void getSkills_returnsPage() throws Exception {
         SkillDto dto = new SkillDto(1L, "Гитара", "Аккорды", "Алексей", 1L);
-        Page<SkillDto> page = new PageImpl<>(List.of(dto));
+        PagedResponse<SkillDto> response = new PagedResponse<>(
+                List.of(dto),
+                0,
+                20,
+                1,
+                1
+        );
 
-        when(skillService.findAllSkills(any(Pageable.class))).thenReturn(page);
+        when(skillService.findAllSkills(any(Pageable.class))).thenReturn(response);
 
         mockMvc.perform(get("/api/skills"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].title").value("Гитара"))
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1));
     }
 
     @Test

@@ -1,18 +1,25 @@
 package com.example.skillswap.Tests;
 
+import com.example.skillswap.DTO.PagedResponse;
 import com.example.skillswap.DTO.SkillDto;
 import com.example.skillswap.Entities.Skill;
 import com.example.skillswap.Entities.User;
 import com.example.skillswap.Repositories.SkillRepository;
 import com.example.skillswap.Repositories.UserRepository;
+import com.example.skillswap.Services.NotificationService;
 import com.example.skillswap.Services.SkillService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +35,9 @@ public class SkillServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private SkillService skillService;
@@ -78,5 +88,21 @@ public class SkillServiceTest {
 
         assertThat(result.title()).isEqualTo("Йога");
         assertThat(result.ownerName()).isEqualTo("Алексей");
+    }
+
+    @Test
+    void findAllSkills_returnsPage() {
+        Pageable pageable = PageRequest.of(0, 20);
+        User owner = new User("alexey", "Алексей", "hash");
+        Skill skill = new Skill("Гитара", "Аккорды", owner);
+        Page<Skill> page = new PageImpl<>(List.of(skill), pageable, 1);
+
+        when(skillRepository.findAll(pageable)).thenReturn(page);
+
+        PagedResponse<SkillDto> result = skillService.findAllSkills(pageable);
+
+        assertThat(result.content()).hasSize(1);
+        assertThat(result.content().getFirst().title()).isEqualTo("Гитара");
+        assertThat(result.totalElements()).isEqualTo(1);
     }
 }
