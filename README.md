@@ -28,16 +28,6 @@ PostgreSQL: `localhost:5433`. Данные сохраняются между п�
 
 ---
 
-## Test users
-
-| Username | Password | Role |
-|----------|----------|------|
-| alexey | secret | ADMIN |
-| maria | secret | USER |
-| ivan | secret | USER |
-
----
-
 ## API
 
 **Auth:**
