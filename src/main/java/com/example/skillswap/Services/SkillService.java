@@ -24,11 +24,13 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final AuditService auditService;
+    private final NotificationService notificationService;
 
-    public SkillService(SkillRepository skillRepository, UserRepository userRepository, AuditService auditService){
+    public SkillService(SkillRepository skillRepository, UserRepository userRepository, AuditService auditService, NotificationService notificationService){
         this.skillRepository = skillRepository;
         this.userRepository = userRepository;
         this.auditService = auditService;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -55,6 +57,7 @@ public class SkillService {
                 ));
 
         Skill saved = skillRepository.save(Skill.fromDto(dto, owner));
+        notificationService.sendEmailAsync(owner.getUsername() + "@skillswap.com", "New skill created" + saved.getTitle());
         return saved.toDto();
     }
 
