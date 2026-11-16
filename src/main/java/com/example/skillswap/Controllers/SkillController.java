@@ -1,5 +1,6 @@
 package com.example.skillswap.Controllers;
 
+import com.example.skillswap.DTO.PagedResponse;
 import com.example.skillswap.DTO.SkillDto;
 import com.example.skillswap.Services.SkillService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +32,7 @@ public class SkillController {
 
     @GetMapping
     @Operation(summary = "Список навыков", description = "Возвращает постраничный список всех навыков")
-    public Page<SkillDto> list(
+    public PagedResponse<SkillDto> list(
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable) {
         return service.findAllSkills(pageable);

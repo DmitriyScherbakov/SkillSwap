@@ -1,10 +1,13 @@
 package com.example.skillswap.Services;
 
+import com.example.skillswap.DTO.PagedResponse;
 import com.example.skillswap.DTO.SkillDto;
 import com.example.skillswap.Entities.Skill;
 import com.example.skillswap.Entities.User;
 import com.example.skillswap.Repositories.SkillRepository;
 import com.example.skillswap.Repositories.UserRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,11 +32,13 @@ public class SkillService {
     }
 
     @Transactional(readOnly = true)
-    public Page<SkillDto> findAllSkills(Pageable pageable) {
-        return skillRepository.findAll(pageable).map(Skill::toDto);
+    @Cacheable(value = "skills", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
+    public PagedResponse<SkillDto> findAllSkills(Pageable pageable) {
+        return PagedResponse.from(skillRepository.findAll(pageable).map(Skill::toDto));
     }
 
     @Transactional(readOnly = true)
+    @CacheEvict(value = "skills", allEntries = true)
     public SkillDto findSkillById(Long id){
         return skillRepository.findById(id).map(Skill::toDto).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -41,7 +46,7 @@ public class SkillService {
         ));
     }
 
-
+    @CacheEvict(value = "skills", allEntries = true)
     public SkillDto createSkill(SkillDto dto, String username){
         User owner = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -53,6 +58,7 @@ public class SkillService {
         return saved.toDto();
     }
 
+    @CacheEvict(value = "skills", allEntries = true)
     public void deleteSkill(Long id, String username) {
         if (!skillRepository.existsById(id)) {
             throw new ResponseStatusException(
@@ -64,6 +70,7 @@ public class SkillService {
         auditService.logDelete(id, username);
     }
 
+    @CacheEvict(value = "skills", allEntries = true)
     public SkillDto updateSkill (Long id, SkillDto dto){
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
