@@ -6,7 +6,6 @@ import com.example.skillswap.Entities.Skill;
 import com.example.skillswap.Entities.User;
 import com.example.skillswap.Repositories.SkillRepository;
 import com.example.skillswap.Repositories.UserRepository;
-import com.example.skillswap.Services.NotificationService;
 import com.example.skillswap.Services.SkillService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,9 +34,6 @@ public class SkillServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private NotificationService notificationService;
 
     @InjectMocks
     private SkillService skillService;

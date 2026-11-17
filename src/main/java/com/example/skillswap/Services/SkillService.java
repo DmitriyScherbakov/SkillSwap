@@ -6,32 +6,26 @@ import com.example.skillswap.Entities.Skill;
 import com.example.skillswap.Entities.User;
 import com.example.skillswap.Repositories.SkillRepository;
 import com.example.skillswap.Repositories.UserRepository;
+import com.example.skillswap.events.SkillCreatedEvent;
+import com.example.skillswap.events.SkillEventPublisher;
+import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-
 @Service
 @Transactional
+@AllArgsConstructor
 public class SkillService {
 
     private final SkillRepository skillRepository;
     private final UserRepository userRepository;
     private final AuditService auditService;
-    private final NotificationService notificationService;
-
-    public SkillService(SkillRepository skillRepository, UserRepository userRepository, AuditService auditService, NotificationService notificationService){
-        this.skillRepository = skillRepository;
-        this.userRepository = userRepository;
-        this.auditService = auditService;
-        this.notificationService = notificationService;
-    }
+    private final SkillEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     @Cacheable(value = "skills", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
@@ -57,7 +51,10 @@ public class SkillService {
                 ));
 
         Skill saved = skillRepository.save(Skill.fromDto(dto, owner));
-        notificationService.sendEmailAsync(owner.getUsername() + "@skillswap.com", "New skill created" + saved.getTitle());
+
+        eventPublisher.publishSkillCreated(
+                new SkillCreatedEvent(saved.getId(), saved.getTitle(), owner.getUsername())
+        );
         return saved.toDto();
     }
 
