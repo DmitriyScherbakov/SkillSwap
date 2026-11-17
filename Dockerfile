@@ -1,31 +1,28 @@
-# ===== Stage 1: сборка =====
 FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /app
 
-# Сначала копируем только файлы, нужные для загрузки зависимостей
-# Это ускоряет повторные сборки: если pom.xml не менялся — зависимости из кэша
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
+COPY eureka-server eureka-server/
+COPY skill-service skill-service/
+COPY notification-service notification-service/
+COPY api-gateway api-gateway/
 
-# Загружаем зависимости (кэшируется в слое Docker)
-RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
+RUN chmod +x mvnw
 
-# Теперь копируем исходники и собираем jar
-COPY src src
+RUN ./mvnw dependency:go-offline -B
+
 RUN ./mvnw clean package -DskipTests -B
 
-# ===== Stage 2: runtime =====
 FROM eclipse-temurin:21-jre
 
+ARG MODULE
 WORKDIR /app
 
-# Копируем собранный jar из builder-этапа
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder /app/${MODULE}/target/*.jar app.jar
 
-# Открываем порт (информационно, реально публикуется через docker-compose)
-EXPOSE 8080
+EXPOSE 8080 8081 8082 8761
 
-# Запускаем приложение
 ENTRYPOINT ["java", "-jar", "app.jar"]
