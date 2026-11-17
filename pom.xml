@@ -18,8 +18,10 @@
     <name>SkillSwap Parent</name>
 
     <modules>
+        <module>eureka-server</module>
         <module>skill-service</module>
         <module>notification-service</module>
+        <module>api-gateway</module>
     </modules>
 
     <properties>
