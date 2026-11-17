@@ -7,6 +7,7 @@ import com.example.skillswap.Entities.User;
 import com.example.skillswap.Repositories.SkillRepository;
 import com.example.skillswap.Repositories.UserRepository;
 import com.example.skillswap.Services.SkillService;
+import com.example.skillswap.events.SkillEventPublisher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,17 +39,17 @@ public class SkillServiceTest {
     @InjectMocks
     private SkillService skillService;
 
+    @Mock
+    private SkillEventPublisher eventPublisher;
+
     @Test
     void findById_returnsDto_whenSkillExists() {
-        // given
         User owner = new User("alexey", "Алексей", "111");
         Skill skill = new Skill("Гитара", "Аккорды", owner);
         when(skillRepository.findById(1L)).thenReturn(Optional.of(skill));
 
-        // when
         SkillDto result = skillService.findSkillById(1L);
 
-        // then
         assertThat(result.title()).isEqualTo("Гитара");
         assertThat(result.ownerName()).isEqualTo("Алексей");
     }
