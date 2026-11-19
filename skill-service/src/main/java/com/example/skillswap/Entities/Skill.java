@@ -14,7 +14,10 @@ public class Skill {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
+
+    @Column(length = 500)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)

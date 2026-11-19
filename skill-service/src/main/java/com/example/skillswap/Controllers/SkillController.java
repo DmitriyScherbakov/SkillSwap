@@ -45,7 +45,7 @@ public class SkillController {
     }
 
     @PostMapping
-    @Operation(summary = "Создать навык", description = "Хуй")
+    @Operation(summary = "Создать навык", description = "Создаёт новый навык для текущего пользователя")
     public SkillDto create(@Valid @RequestBody SkillDto dto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
@@ -57,7 +57,7 @@ public class SkillController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Удалить навык", description = "Хуй")
+    @Operation(summary = "Удалить навык", description = "Удаляет навык по ID (только ADMIN)")
     public void delete(@PathVariable Long id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         assert auth != null;
@@ -66,7 +66,7 @@ public class SkillController {
 
     @PutMapping("/{id}")
     @PreAuthorize("@skillSecurity.isOwner(#id, authentication.name) or hasRole('ADMIN')")
-    @Operation(summary = "Поменять навык", description = "Хуй")
+    @Operation(summary = "Поменять навык", description = "Обновляет навык (только владелец или ADMIN)")
     public SkillDto update(@PathVariable Long id, @Valid @RequestBody SkillDto dto) {
         return service.updateSkill(id, dto);
     }

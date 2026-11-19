@@ -28,13 +28,22 @@ public class SkillService {
     private final SkillEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "skills", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "skills", keyGenerator = "pageableKeyGenerator")
     public PagedResponse<SkillDto> findAllSkills(Pageable pageable) {
         return PagedResponse.from(skillRepository.findAll(pageable).map(Skill::toDto));
     }
 
+    /**
+     * Чтение одного навыка намеренно не кэшируется.
+     *
+     * <p>Раньше здесь стоял {@code @CacheEvict(allEntries = true)}, то есть
+     * любой GET по одному навыку сбрасывал кэш всех списков — кэш переставал
+     * работать после первого же запроса. Собственный кэш по id здесь тоже не
+     * нужен: TTL составляет 10 минут, а любое изменение и так инвалидирует
+     * списки, поэтому отдельная запись потребовала бы только лишней логики
+     * инвалидации без заметной выгоды.
+     */
     @Transactional(readOnly = true)
-    @CacheEvict(value = "skills", allEntries = true)
     public SkillDto findSkillById(Long id){
         return skillRepository.findById(id).map(Skill::toDto).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -42,6 +51,13 @@ public class SkillService {
         ));
     }
 
+    /**
+     * Полная очистка кэша списков — осознанное решение, а не лень.
+     *
+     * <p>При постраничном кэшировании точечная инвалидация невозможна: создание
+     * навыка меняет содержимое и количество страниц, а также порядок элементов
+     * при сортировке по любому полю. Поэтому чистим весь регион "skills".
+     */
     @CacheEvict(value = "skills", allEntries = true)
     public SkillDto createSkill(SkillDto dto, String username){
         User owner = userRepository.findUserByUsername(username)
