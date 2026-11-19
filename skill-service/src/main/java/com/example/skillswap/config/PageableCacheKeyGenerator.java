@@ -8,16 +8,6 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.stream.Collectors;
 
-/**
- * Строит ключ кэша из всех значимых частей аргументов метода.
- *
- * <p>Ключ собирается явно, а не через {@code Pageable.toString()}: формат
- * {@code toString()} не является контрактом и менялся между версиями
- * Spring Data. Здесь в ключ попадают номер страницы, размер и полный
- * список сортировок (поле + направление), поэтому
- * {@code ?page=0&size=20&sort=id,asc} и {@code ?page=0&size=20&sort=title,desc}
- * дают разные записи кэша.
- */
 @Component("pageableKeyGenerator")
 public class PageableCacheKeyGenerator implements KeyGenerator {
 

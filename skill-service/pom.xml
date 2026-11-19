@@ -190,14 +190,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			<!--
-				Mockito подключается как javaagent.
-
-				Начиная с JDK 21+ self-attaching агента запрещён, поэтому без этой
-				настройки на новых JDK все тесты с mock'ами падают с
-				"Could not initialize plugin: interface org.mockito.plugins.MockMaker".
-				Явное подключение агента делает сборку воспроизводимой на любой JDK.
-			-->
+			<!-- Mockito как javaagent: self-attach запрещён на JDK 21+. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
